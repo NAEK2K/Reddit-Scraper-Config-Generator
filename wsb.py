@@ -45,6 +45,24 @@ def parse_selftext(selftext, **options):
 
     return []
 
+def remove_embed(selftext):
+    #print(selftext)
+    selftext = selftext.split("\n")
+    newtext = ""
+    regex = "(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+
+    for thing in selftext:
+        for word in thing.split():
+            if "](" in word:
+                #print(word)
+                newtext += "<" + word[word.find("](")+2:word.find(")")] + "> "
+                #print(word[word.find("](")+2:word.find(")")])
+            else:
+                newtext += word + " "
+    
+    #print(newtext)
+    return newtext
+
 def send_discord_message(message, webhook_url=config.get("discord", {}).get("webhook_url", "")):
     data = {
         "username": config.get("discord", {}).get("username", "Unnamed Webhook"),
@@ -65,6 +83,8 @@ if __name__ == "__main__":
 
     for submission in subreddit.new(limit=100):
         parser = parse_selftext(submission.selftext, words=[".*tl(.|)dr.*"])
+        embed_free = remove_embed("\n".join(parser))
+        #print(embed_free)
         if parser:
             query_dict = {"url": "https://old.reddit.com/{}".format(submission.permalink)}
             c.execute("SELECT url FROM wsb_posts WHERE url = :url", query_dict)
@@ -76,12 +96,13 @@ if __name__ == "__main__":
                         submission.score,
                         datetime.fromtimestamp(submission.created_utc),
                         "https://old.reddit.com/{}".format(submission.permalink),
-                        "\n".join(parser))
+                        #"\n".join(embed_free))
+                        embed_free)
                 )
-                formatted_message = "Title: {}\nScore: {}\nDate: {}\nURL: {}\n{}".format(submission.title, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), "\n".join(parser))
+                formatted_message = "Title: {}\nScore: {}\nDate: {}\nURL: {}\n{}".format(submission.title, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), embed_free)
                 send_discord_message(formatted_message)
 
-        print("Command executed successfully.")
+        #print("Command executed successfully.")
 
     conn.commit()
     conn.close()
