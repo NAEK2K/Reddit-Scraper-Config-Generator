@@ -100,7 +100,8 @@ if __name__ == "__main__":
                         embed_free)
                 )
                 formatted_message = "Title: {}\nScore: {}\nDate: {}\nURL: {}\n{}".format(submission.title, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), embed_free)
-                send_discord_message(formatted_message)
+                #send_discord_message(formatted_message)
+                print(formatted_message)
 
         #print("Command executed successfully.")
 
