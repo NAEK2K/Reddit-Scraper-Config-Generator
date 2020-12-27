@@ -4,12 +4,7 @@ from datetime import datetime
 import yaml
 import sqlite3
 import os
-
-#     TITLE TEXT,
-#     SCORE INTEGER,
-#     DATE TEXT,
-#     URL TEXT,
-#     TLDR TEXT
+import requests
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -39,7 +34,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-
 def parse_selftext(selftext, **options):
     selftext_regex = re.compile(r"|".join(options.get("words")))
     selftext = selftext.split("\n")
@@ -51,33 +45,43 @@ def parse_selftext(selftext, **options):
 
     return []
 
+def send_discord_message(message, webhook_url=config.get("discord", {}).get("webhook_url", "")):
+    data = {
+        "username": config.get("discord", {}).get("username", "Unnamed Webhook"),
+        "avatar_url": config.get("discord", {}).get("avatar_url", ""),
+        "content": message
+    }
+    requests.post(webhook_url, data = data)
+
 
 if __name__ == "__main__":
     if not os.path.exists("wsb_posts.db"):
         init_db()
 
     conn = sqlite3.connect("wsb_posts.db")
-
     c = conn.cursor()
-
     reddit = init_praw()
-
     subreddit = reddit.subreddit("wallstreetbets")
 
     for submission in subreddit.new(limit=100):
         parser = parse_selftext(submission.selftext, words=[".*tl(.|)dr.*"])
         if parser:
-            # print("TITLE: {}\nSCORE: {}\nDATE: {}\nURL: {}".format(submission.title, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink)))
-            print("\n".join(parser))
-            # print(50*"=")
-            c.execute(
-                "INSERT INTO wsb_posts (title, score, date, url, tldr) VALUES (?, ?, ?, ?, ?)",
-                    (submission.title,
-                    submission.score,
-                    datetime.fromtimestamp(submission.created_utc),
-                    "https://old.reddit.com/{}".format(submission.permalink),
-                    "\n".join(parser))
-            )
+            query_dict = {"url": "https://old.reddit.com/{}".format(submission.permalink)}
+            c.execute("SELECT url FROM wsb_posts WHERE url = :url", query_dict)
+
+            if not c.fetchone():
+                c.execute(
+                    "INSERT INTO wsb_posts (title, score, date, url, tldr) VALUES (?, ?, ?, ?, ?)",
+                        (submission.title,
+                        submission.score,
+                        datetime.fromtimestamp(submission.created_utc),
+                        "https://old.reddit.com/{}".format(submission.permalink),
+                        "\n".join(parser))
+                )
+                formatted_message = "Title: {}\nScore: {}\nDate: {}\nURL: {}\n{}".format(submission.title, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), "\n".join(parser))
+                send_discord_message(formatted_message)
+
         print("Command executed successfully.")
+
     conn.commit()
     conn.close()
