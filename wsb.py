@@ -58,16 +58,6 @@ def send_discord_message(message, webhook_url=config.get("discord", {}).get("web
     }
     requests.post(webhook_url, data = data)
 
-def remove_embed_links(text):
-    url_regex = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
-    url_match = url_regex.findall(text)
-
-    if url_match:
-        url_match = [url[0] for url in url_match]
-        [text.replace(url, "<{}>".format(url)) for url in url_match]
-
-    return text 
-
 if __name__ == "__main__":
     if not os.path.exists("wsb_posts.db"):
         init_db()
@@ -94,7 +84,7 @@ if __name__ == "__main__":
                         "https://old.reddit.com/{}".format(submission.permalink),
                         "\n".join(parser))
                 )
-                formatted_message = "Title: {}\nAuthor: {}\nScore: {}\nDate: {}\nURL: {}\n{}".format(submission.title, submission.author.name, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), "\n".join(parser))
+                formatted_message = "Title: {}\nAuthor: {}\nScore: {}\nDate: {}\nURL: <{}>\n```{}```".format(submission.title, submission.author.name, submission.score, datetime.fromtimestamp(submission.created_utc), "https://old.reddit.com/{}".format(submission.permalink), "\n".join(parser))
                 send_discord_message(formatted_message)
 
     conn.commit()
