@@ -6,8 +6,11 @@ name = "pypi"
 [packages]
 praw = "*"
 pyyaml = "*"
+jedi = "*"
+black = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.8"
