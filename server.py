@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from flask_restful import Api
 import yaml
 import os
+import subprocess
 
 app = Flask(__name__)
 api = Api(app)
@@ -99,11 +100,27 @@ def configfile(config_name):
             tracked_users = config.get("reddit_bot").get("tracked_users"),
             user_agent = config.get("reddit_bot").get("user_agent"),
             reddit_username = config.get("reddit_bot").get("username"),
-            reddit_password = config.get("reddit_bot").get("subreddit_name"),
+            reddit_password = config.get("reddit_bot").get("password"),
             file_name = config.get("name")
             )
     else:
         pass
+
+@app.route("/start/<config_name>", methods=["POST"])
+def start(config_name):
+    python = 'python3'
+
+    subprocess.run('{python} tracker.py --config {config_name}'.format(python = python, config_name = config_name), shell=True)
+
+    return redirect("/config/")
+
+@app.route("/delete/<config_name>", methods=["POST"])
+def delete(config_name):
+    path = "./config/"
+    fullpath = "{path}{config_name}.yaml".format(path = path, config_name = config_name)
+    os.remove(fullpath)
+    
+    return redirect("/config/")
 
 if __name__ == "__main__":
     app.run(debug=True)
