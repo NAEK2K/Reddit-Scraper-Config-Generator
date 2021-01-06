@@ -33,8 +33,12 @@
             <div class="grid-item">
                 <a href="{{configs[file][key]}}" >{{configs[file][key]}}</a>
                 <br>
-                <button id="{{configs[file][key]}}" type="button">Start</button>
-                <button id="{{configs[file][key]}}" type="button">Delete</button> 
+                <form action="/start/{{configs[file][key]}}" method="POST">
+                    <button id="{{configs[file][key]}}" type="submit">Start</button>
+                </form>
+                <form action="/delete/{{configs[file][key]}}" method="POST">
+                    <button id="{{configs[file][key]}}" type="submit">Delete</button> 
+                </form>
             </div>
             {% endif %}
             {% endfor %}
