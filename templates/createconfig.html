@@ -19,7 +19,7 @@
         <br>
 
         <label for="num_limit">Number of posts: </label>
-        <input type="text" name="num_limit" id="num_limit" value="{{num_limit}}" required>
+        <input type="number" step="1" name="num_limit" id="num_limit" value="{{num_limit}}" required>
         <br>
 
         <select name="filter" id="filter">
@@ -73,6 +73,7 @@
     </form>
 
     <a href="/"><button>Back to index</button></a>
+    <h1>{{message}}</h1>
 </body>
 
 </html>
