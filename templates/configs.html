@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of configs</title>
+</head>
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        background-color: #2196F3;
+        padding: 10px;
+    }
+
+    .grid-item {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        font-size: 30px;
+        text-align: center;
+    }
+</style>
+
+<body>
+    {%if count > 0: %}
+        <h1>There are {{count}} config(s) available.</h1>
+        <div class="grid-container">
+            {%for file in configs%}
+            {%for key in configs[file]%}
+            {%if key == "name"%}
+            <div class="grid-item">
+                <a href="{{configs[file][key]}}" >{{configs[file][key]}}</a>
+                <br>
+                <form action="/start/{{configs[file][key]}}" method="POST">
+                    <button id="{{configs[file][key]}}" type="submit">Start</button>
+                </form>
+                <form action="/delete/{{configs[file][key]}}" method="POST">
+                    <button id="{{configs[file][key]}}" type="submit">Delete</button> 
+                </form>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </div>
+    {%else: %}
+        <h1>There are no configs available.</h1>
+    {% endif %}
+
+    <a href="/"><button type="button">Back to index</button></a>
+</body>
+
+</html>

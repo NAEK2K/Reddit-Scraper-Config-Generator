@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a config</title>
+</head>
+
+<body>
+    <form action="/create_config/" method="POST">
+
+        <label for="subreddit_name">Subreddit name: </label>
+        <input type="text" name="subreddit_name" id="subreddit_name" value="{{subreddit_name}}" required>
+        <br>
+
+        <label for="keywords">Keywords (comma separated): </label>
+        <input type="text" name="keywords" id="keywords" value="{{keywords}}" required>
+        <br>
+
+        <label for="num_limit">Number of posts: </label>
+        <input type="number" step="1" name="num_limit" id="num_limit" value="{{num_limit}}" required>
+        <br>
+
+        <select name="filter" id="filter">
+            <option value="select_a_filter" disabled>Select a filter</option>
+            <option value="hot">Hot</option>
+            <option value="new">New</option>
+        </select>
+        <br>
+
+        <label for="client_id">Client ID: </label>
+        <input type="text" name="client_id" id="client_id" value="{{client_id}}" required>
+        <br>
+
+        <label for="client_secret">Client Secret: </label>
+        <input type="text" name="client_secret" id="client_secret" value="{{client_secret}}" required>
+        <br>
+
+        <label for="user_agent">User Agent: </label>
+        <input type="text" name="user_agent" id="user_agent" value="{{user_agent}}" required>
+        <br>
+
+        <label for="reddit_username">Reddit Username: </label>
+        <input type="text" name="reddit_username" id="reddit_username" value="{{reddit_username}}" required>
+        <br>
+
+        <label for="reddit_password">Reddit Password: </label>
+        <input type="text" name="reddit_password" id="reddit_password" value="{{reddit_password}}" required>
+        <br>
+
+        <label for="tracked_users">Tracked Users: </label>
+        <input type="text" name="tracked_users" id="tracked_users" value="{{tracked_users}}" required>
+        <br>
+
+        <label for="discord_bot_name">Discord Bot Name: </label>
+        <input type="text" name="discord_bot_name" id="discord_bot_name" value="{{discord_bot_name}}" required>
+        <br>
+
+        <label for="discord_bot_picture">Discord Bot Picture: </label>
+        <input type="text" name="discord_bot_picture" id="discord_bot_picture" value="{{discord_bot_picture}}" required>
+        <br>
+
+        <label for="discord_bot_webhook">Discord Webhook: </label>
+        <input type="text" name="discord_bot_webhook" id="discord_bot_webhook" value="{{discord_bot_webhook}}" required>
+        <br>
+
+        <label for="file_name">File name: </label>
+        <input type="text" name="file_name" id="file_name" value="{{file_name}}" required>
+        <br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <a href="/"><button>Back to index</button></a>
+    <h1>{{message}}</h1>
+</body>
+
+</html>
