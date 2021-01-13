@@ -67,12 +67,11 @@ def send_discord_message(message, **options):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Pass config into tracker.py')
-    parser.add_argument('--config', help="name of config file")
+    parser = argparse.ArgumentParser(description="Pass config into tracker.py")
+    parser.add_argument("--config", help="name of config file")
     args = parser.parse_args()
 
-    with open("./config/{}.yaml".format(args.config), "r") as f:
-        print(args.config)
+    with open(args.config, "r") as f:
         config = yaml.safe_load(f)
         reddit_bot = config.get("reddit_bot")
         discord = config.get("discord")
