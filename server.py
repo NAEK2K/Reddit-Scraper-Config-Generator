@@ -109,8 +109,7 @@ def configfile(config_name):
 @app.route("/start/<config_name>", methods=["POST"])
 def start(config_name):
     python = 'python3'
-
-    subprocess.run('{python} tracker.py --config {config_name}'.format(python = python, config_name = config_name), shell=True)
+    subprocess.run('{python} tracker.py --config ./config/{config_name}.yaml'.format(python = python, config_name = config_name), shell=True)
 
     return redirect("/config/")
 

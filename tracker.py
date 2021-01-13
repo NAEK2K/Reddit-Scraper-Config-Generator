@@ -89,6 +89,7 @@ if __name__ == "__main__":
         client_secret=reddit_bot.get("client_secret"),
         user_agent=reddit_bot.get("user_agent"),
     )
+    reddit_bot["num_limit"] = int(reddit_bot.get("num_limit"))
     subreddit = reddit.subreddit(reddit_bot.get("subreddit_name"))
 
     conn = sqlite3.connect("posts.db")
