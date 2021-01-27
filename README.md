@@ -1,4 +1,4 @@
-# wsb-stock-miner
+# Reddit Scraper Config Generator
 
 Developed by Nick and Adrian
 
