@@ -7,6 +7,7 @@ import os
 
 # program
 
+
 class Scraper:
     def __init__(self, **options):
         """
@@ -27,8 +28,14 @@ class Scraper:
                                     PRIMARY KEY (post_link, post_group)
                                 );"""
         self.SQL_INSERT_POST = """INSERT INTO {table} (post_link, post_title, post_author, post_score, post_date, post_group)
-                                VALUES(?, ?, ?, ?, ?, ?)"""
-        self.SQL_SELECT_POST = """SELECT * FROM {table} WHERE post_link = ? AND post_group = ?"""
+                                VALUES(?, ?, ?, ?, ?, ?);"""
+        self.SQL_SELECT_ONE_POST = (
+            """SELECT * FROM {table} WHERE post_link = ? AND post_group = ?;"""
+        )
+        self.SQL_SELECT_ALL_POSTS = """SELECT * FROM {table} WHERE post_group = ? ORDER BY datetime(post_date);"""
+        self.SQL_DELETE_POST = (
+            """DELETE FROM {table} WHERE post_link = ? AND post_group = ?;"""
+        )
         self.DEFAULT_DB_DIR = "dbs"
         self.DEFAULT_DB_NAME = "db"
         self.DEFAULT_TABLE_NAME = "posts"
@@ -40,12 +47,12 @@ class Scraper:
 
         self.db_name = options.get("db_name", self.DEFAULT_DB_NAME)
 
-        self.conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
-        self.cursor = self.conn.cursor()
-
         self.table_name = options.get("table_name", self.DEFAULT_TABLE_NAME)
 
-        self.cursor.execute(self.SQL_CREATE_TABLE.format(table=self.table_name))
+        conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
+        cursor = conn.cursor()
+        cursor.execute(self.SQL_CREATE_TABLE.format(table=self.table_name))
+        conn.close()
 
     def post_exists(self, **options):
         """
@@ -54,12 +61,20 @@ class Scraper:
         """
 
         post_link = options.get("post_link")
-        post_group = options.get("post_group")
+        post_group = options.get("post_group", self.DEFAULT_POST_GROUP)
 
-        self.cursor.execute(self.SQL_SELECT_POST.format(table=self.table_name), (post_link, post_group))
+        conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
+        cursor = conn.cursor()
 
-        return True if self.cursor.fetchall() else False
+        cursor.execute(
+            self.SQL_SELECT_ONE_POST.format(table=self.table_name),
+            (post_link, post_group),
+        )
 
+        rows = cursor.fetchall()
+        conn.close()
+
+        return True if rows else False
 
     def post_save(self, **options):
         """
@@ -81,11 +96,61 @@ class Scraper:
         if self.post_exists(post_link=post_link, post_group=post_group):
             return False
 
-        self.cursor.execute(self.SQL_INSERT_POST.format(table=self.table_name), (post_link, post_title, post_author, post_score, post_date, post_group))
-        self.conn.commit()
+        conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
+        cursor = conn.cursor()
+
+        cursor.execute(
+            self.SQL_INSERT_POST.format(table=self.table_name),
+            (post_link, post_title, post_author, post_score, post_date, post_group),
+        )
+        conn.commit()
+        conn.close()
 
         return True
+
+    def post_delete(self, **options):
+        """
+        post_link (str): link of the post
+        post_group (str): name of the group the post is saved under
+        """
+
+        post_link = options.get("post_link")
+        post_group = options.get("post_group", self.DEFAULT_POST_GROUP)
+
+
+        if not self.post_exists(post_link=post_link, post_group=post_group):
+            return False
+
+        conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
+        cursor = conn.cursor()
+
+        cursor.execute(
+            self.SQL_DELETE_POST.format(table=self.table_name), (post_link, post_group)
+        )
+        conn.commit()
+        conn.close()
+
+        return True
+
+    def get_posts(self, **options):
+        """
+        post_group (str): name of the group the posts are saved under
+        """
+
+        post_group = options.get("post_group", self.DEFAULT_POST_GROUP)
+
+        conn = sqlite3.connect(os.path.join(self.db_dir, self.db_name))
+        cursor = conn.cursor()
+
+        cursor.execute(self.SQL_SELECT_ALL_POSTS.format(table=self.table_name), (post_group,))
+
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows
 
 
 if __name__ == "__main__":
     s = Scraper()
+    print(s.get_posts())
