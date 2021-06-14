@@ -1,27 +1,34 @@
 import React from "react";
 
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
-import Create from "./components/Create";
 
-// import Configs from "./pages/Configs";
+import Configs from "./pages/Configs";
+import Feed from "./pages/Feed";
+import Settings from "./pages/Settings";
 
 export default function App() {
-  return (
-    <div class="bg-gray-900 h-full flex flex-cols">
-      <Router>
-        <Navigation />
-        <Switch>
-          <Route path="/"></Route>
 
-          <Route path="/feed"></Route>
-          <Route path="/settings"></Route>
-        </Switch>
-      </Router>
-      <div className="flex justify-center items-center w-full">
-        <Create />
-      </div>
-    </div>
-  );
+    return (
+        <Router>
+          <div className="bg-gray-900 h-full flex flex-row">
+            <Navigation />
+            <Switch>
+              <Route exact path="/">
+                <Configs />
+              </Route>
+
+              <Route exact path="/feed">
+                <Feed />
+              </Route>
+
+              <Route exact path="/settings">
+                <Settings />
+              </Route>
+
+            </Switch>
+          </div>
+        </Router>
+)
 }
