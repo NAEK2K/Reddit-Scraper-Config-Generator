@@ -23,10 +23,12 @@ export default function Configs() {
           Add
         </button>
       </div>
-      {!open && (
+      {open && (
         <div className="absolute inset-0 w-screen h-screen">
           <div className="flex h-full justify-center items-center">
-            <Create />
+            <Create
+              setOpen={setOpen} 
+            />
           </div>
         </div>
       )}
